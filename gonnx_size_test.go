@@ -27,7 +27,8 @@ go 1.24.0
 require github.com/mackross/gonnx v0.0.0
 
 replace github.com/mackross/gonnx => %s
-`, filepath.ToSlash(repoDir)))
+replace github.com/shota3506/onnxruntime-purego => %s
+`, filepath.ToSlash(repoDir), filepath.ToSlash(filepath.Join(repoDir, "third_party", "onnxruntime-purego"))))
 
 	writeFile(t, filepath.Join(dir, "cmd", "one", "main.go"), `package main
 
