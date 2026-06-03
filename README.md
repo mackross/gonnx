@@ -54,38 +54,37 @@ Available runtime packages:
 - `github.com/mackross/gonnx/runtimes/windowsamd64`
 - `github.com/mackross/gonnx/runtimes/windowsarm64`
 
-## Bundled models
+## Model packages
 
-Bundled models live in the nested module `github.com/mackross/gonnx/models`.
-They are optional: importing the root `gonnx` package does not embed model
-weights. Import only the model packages you want to ship, plus one runtime
-package for your target platform.
+Model packages live outside this repository under the `gonnx-models` GitHub
+organization. The root `gonnx` module stays small and only provides runtime,
+extraction, chunk-joining, and tensor helpers.
 
-Each model package exposes a high-level `Open(opts ...gonnx.Option)` helper for
-normal use. Voice packages also expose `OpenSession` for raw ONNX Runtime access.
+Examples:
 
-| Package | Task | Embedded assets | Public entry point | Notes |
-| --- | --- | ---: | --- | --- |
-| `models/silero` | Voice activity detection | ~2 MiB ONNX | `silero.Open(...)` | Stateful Silero VAD for 16 kHz PCM. Accepts 512-sample chunks and returns speech probability. |
-| `models/smartturn` | Voice turn-completion detection | ~25 MiB ONNX | `smartturn.Open(...)` | Smart Turn v3.2 CPU model. Converts the last 8 seconds of 16 kHz PCM to log-mel features and predicts whether the user turn is complete. |
-| `models/neurobert` | Named entity recognition | ~9.3 MiB ONNX + vocab/config | `neurobert.Open(...)` | Tiny English NER model. Fastest/smallest bundled NER option, with lower accuracy tradeoff and richer OntoNotes-like labels such as `PERSON`, `ORG`, `GPE`, `DATE`. |
-| `models/distilbertuncased` | Named entity recognition | ~64 MiB ONNX + vocab/config | `distilbertuncased.Open(...)` | English uncased DistilBERT NER. Smaller/faster than BERT-base; ignores case. |
-| `models/distilbertcased` | Named entity recognition | ~63 MiB ONNX + vocab/config | `distilbertcased.Open(...)` | English cased DistilBERT NER. Smaller/faster than BERT-base while preserving casing signal. |
-| `models/bertuncased` | Named entity recognition | ~105 MiB ONNX + vocab/config | `bertuncased.Open(...)` | English uncased BERT-base NER with CoNLL labels: `PER`, `ORG`, `LOC`, `MISC`. Good default when binary size is acceptable. |
-| `models/bertcased` | Named entity recognition | ~104 MiB ONNX + vocab/config | `bertcased.Open(...)` | English cased BERT-base NER with CoNLL labels. Prefer when casing carries useful signal. |
-| `models/multidistilbert` | Named entity recognition | ~130 MiB ONNX + vocab/config | `multidistilbert.Open(...)` | Multilingual cased DistilBERT NER for high-resource languages. Larger binary; useful when language coverage matters. |
+- `github.com/gonnx-models/silero` — Silero voice activity detection.
+- `github.com/gonnx-models/smartturn` — Smart Turn voice turn-completion detection.
+- `github.com/gonnx-models/neurobert` — tiny English NER.
+- `github.com/gonnx-models/distilbertcased` — cased English DistilBERT NER.
+- `github.com/gonnx-models/distilbertuncased` — uncased English DistilBERT NER.
+- `github.com/gonnx-models/bertcased` — cased English BERT-base NER.
+- `github.com/gonnx-models/bertuncased` — uncased English BERT-base NER.
+- `github.com/gonnx-models/multidistilbert` — multilingual DistilBERT NER.
 
-See [`models/NER_BENCHMARK.md`](models/NER_BENCHMARK.md) for NER model
-benchmark notes and recent relative throughput numbers.
+Model packages expose high-level `Open(opts ...gonnx.Option)` helpers and hide
+shared implementation utilities from callers. Large ONNX files are stored as
+ordinary Git chunks rather than Git LFS, so `go get` can fetch usable embedded
+assets. `ModelBundle.ModelParts` reconstructs chunked models in the local gonnx
+cache before opening an ONNX Runtime session.
 
-Example NER use:
+Example:
 
 ```go
 import (
     "context"
 
+    "github.com/gonnx-models/bertuncased"
     "github.com/mackross/gonnx"
-    "github.com/mackross/gonnx/models/bertuncased"
     _ "github.com/mackross/gonnx/runtimes/linuxamd64"
 )
 
@@ -96,26 +95,6 @@ if err != nil {
 defer recognizer.Close()
 
 entities, err := recognizer.Recognize(context.Background(), "Barack Obama worked at Microsoft in Seattle.")
-```
-
-Example voice use:
-
-```go
-import (
-    "context"
-
-    "github.com/mackross/gonnx"
-    "github.com/mackross/gonnx/models/silero"
-    _ "github.com/mackross/gonnx/runtimes/linuxamd64"
-)
-
-vad, err := silero.Open(gonnx.WithThreads(1))
-if err != nil {
-    return err
-}
-defer vad.Close()
-
-probability, _, err := vad.ProbabilityPCM16(context.Background(), chunk, silero.SampleRate)
 ```
 
 ## Options

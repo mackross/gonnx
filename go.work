@@ -2,7 +2,5 @@ go 1.25
 
 use (
 	.
-	./models
-	./models/smartturn
 	./third_party/onnxruntime-purego
 )

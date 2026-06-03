@@ -20,6 +20,10 @@ type ModelBundle struct {
 	FS fs.FS
 	// ModelRel is the path within FS to the .onnx model.
 	ModelRel string
+	// ModelParts are optional chunks that are concatenated to produce ModelRel.
+	// Use this when a model is split into ordinary Git blobs to avoid host file
+	// size limits. If set, ModelRel names the reconstructed output file.
+	ModelParts []string
 	// ExtraRels are optional adjacent model assets to extract, for example tokenizer files.
 	ExtraRels []string
 }
@@ -40,7 +44,16 @@ func PrepareModelBundle(bundle ModelBundle) (string, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}
-	for _, rel := range append([]string{bundle.ModelRel}, bundle.ExtraRels...) {
+	if len(bundle.ModelParts) == 0 {
+		if err := extractFile(dir, bundle.FS, bundle.ModelRel); err != nil {
+			return "", err
+		}
+	} else {
+		if err := extractJoinedFile(dir, bundle.FS, bundle.ModelRel, bundle.ModelParts); err != nil {
+			return "", err
+		}
+	}
+	for _, rel := range bundle.ExtraRels {
 		if err := extractFile(dir, bundle.FS, rel); err != nil {
 			return "", err
 		}

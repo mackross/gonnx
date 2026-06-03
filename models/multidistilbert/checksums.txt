@@ -1,3 +1,0 @@
-24a0b98f4dd4cd92842f5a541272f86f760225a64a29928eddef14bdb2edb986  assets/model_quantized.onnx
-fe0fda7c425b48c516fc8f160d594c8022a0808447475c1a7c6d6479763f310c  assets/vocab.txt
-38847be4dc6699b1218a749ed69f888c2ccc7b4deba98e3c4a1cac8cb34d54c8  assets/config.json
