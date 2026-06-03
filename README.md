@@ -56,20 +56,28 @@ Available runtime packages:
 
 ## Model packages
 
-Model packages live outside this repository under the `gonnx-models` GitHub
-organization. The root `gonnx` module stays small and only provides runtime,
-extraction, chunk-joining, and tensor helpers.
+Bundled model packages live outside this repository under the
+[`gonnx-models`](https://github.com/gonnx-models) GitHub organization. The root
+`gonnx` module intentionally stays small and only provides ONNX Runtime loading,
+asset extraction, chunk-joining, and tensor helpers.
 
-Examples:
+Users should import individual model modules directly:
 
-- `github.com/gonnx-models/silero` — Silero voice activity detection.
-- `github.com/gonnx-models/smartturn` — Smart Turn voice turn-completion detection.
-- `github.com/gonnx-models/neurobert` — tiny English NER.
-- `github.com/gonnx-models/distilbertcased` — cased English DistilBERT NER.
-- `github.com/gonnx-models/distilbertuncased` — uncased English DistilBERT NER.
-- `github.com/gonnx-models/bertcased` — cased English BERT-base NER.
-- `github.com/gonnx-models/bertuncased` — uncased English BERT-base NER.
-- `github.com/gonnx-models/multidistilbert` — multilingual DistilBERT NER.
+| Import path | Task |
+| --- | --- |
+| [`github.com/gonnx-models/silero`](https://github.com/gonnx-models/silero) | Silero voice activity detection for 16 kHz PCM. |
+| [`github.com/gonnx-models/smartturn`](https://github.com/gonnx-models/smartturn) | Smart Turn voice turn-completion detection. |
+| [`github.com/gonnx-models/neurobert`](https://github.com/gonnx-models/neurobert) | Tiny English NER. |
+| [`github.com/gonnx-models/distilbertcased`](https://github.com/gonnx-models/distilbertcased) | Cased English DistilBERT NER. |
+| [`github.com/gonnx-models/distilbertuncased`](https://github.com/gonnx-models/distilbertuncased) | Uncased English DistilBERT NER. |
+| [`github.com/gonnx-models/bertcased`](https://github.com/gonnx-models/bertcased) | Cased English BERT-base NER. |
+| [`github.com/gonnx-models/bertuncased`](https://github.com/gonnx-models/bertuncased) | Uncased English BERT-base NER. |
+| [`github.com/gonnx-models/multidistilbert`](https://github.com/gonnx-models/multidistilbert) | Multilingual DistilBERT NER. |
+
+The umbrella management repository is
+[`github.com/gonnx-models/models`](https://github.com/gonnx-models/models). It
+contains the model repositories as git submodules plus workspace/docs for
+maintainers; it is not the import path users normally need.
 
 Model packages expose high-level `Open(opts ...gonnx.Option)` helpers and hide
 shared implementation utilities from callers. Large ONNX files are stored as
