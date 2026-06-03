@@ -3,7 +3,7 @@
 `gonnx` is a small Go package for shipping and using ONNX Runtime from Go
 without cgo in your application code. It builds on
 [`onnxruntime-purego`](https://github.com/shota3506/onnxruntime-purego), which loads libonnx using purego (an alternative to cgo - amazing), and adds
-packaging helpers for applications that want a battery included fast ONNX Runtime with the Go
+packaging helpers for applications that want a batteries included fast ONNX Runtime with the Go
 binary. While there are other non-cgo, non purego options, I found the inference to be orders
 of magnitudes slower. This library also has packaging helpers for easy embedding of models 
 in your binary.
