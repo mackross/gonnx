@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/mackross/gonnx"
-	"github.com/mackross/gonnx/models/utils/audioutils"
 	ort "github.com/shota3506/onnxruntime-purego/onnxruntime"
 )
 
@@ -54,7 +53,11 @@ func (d *Detector) PredictPCM16(ctx context.Context, pcm []int16, sampleRate int
 	if sampleRate != SampleRate {
 		return Result{}, fmt.Errorf("smartturn: expected %d Hz audio, got %d", SampleRate, sampleRate)
 	}
-	return d.PredictFloat32(ctx, audioutils.PCM16ToFloat32(pcm))
+	audio := make([]float32, len(pcm))
+	for i, s := range pcm {
+		audio[i] = float32(s) / 32768.0
+	}
+	return d.PredictFloat32(ctx, audio)
 }
 
 // PredictFloat32 predicts turn completion from normalized mono 16 kHz PCM.
